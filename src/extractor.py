@@ -13,7 +13,7 @@ extractor.py - שליפת EXIF מתמונות
 
 
 def has_gps(data: dict):
-    flag = data.get("GPSInfo","")
+    flag = data.get("GPSInfo")
     if flag:
         return True
     else:
@@ -53,11 +53,11 @@ def longitude(data: dict):
 
 
 def datatime(data: dict):
-    return data.get("DateTimeOriginal","zero")
+    return data.get("DateTimeOriginal")
 
 
 def camera_make(data: dict):
-    make = data.get("Make","zero")
+    make = data.get("Make")
     if isinstance(make,str):
         return make.strip().replace("\x00","")
     return make
@@ -72,7 +72,7 @@ def convert_to_decimal(gps_tup):
 
 
 def camera_model(data: dict):
-    model = data.get("Model","zero")
+    model = data.get("Model")
     if isinstance(model,str):
         return model.strip().replace("\x00","")
 
