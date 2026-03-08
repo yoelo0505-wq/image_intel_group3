@@ -13,27 +13,70 @@ extractor.py - שליפת EXIF מתמונות
 
 
 def has_gps(data: dict):
-    pass
+    flag = data.get("GPSInfo","")
+    if flag:
+        return True
+    else:
+        return False
 
 
 def latitude(data: dict):
-    pass
+    gps = data.get("GPSInfo")
+
+    if gps:
+        my_tuple = gps.get(2)
+        ref = gps.get(1)
+
+        if my_tuple:
+            decimal_value = convert_to_decimal(my_tuple)
+
+            if ref == "S":
+                return -decimal_value
+            return decimal_value
+    return None
 
 
 def longitude(data: dict):
-    pass
+    gps = data.get("GPSInfo")
+
+    if gps:
+        my_tuple = gps.get(4)
+        ref = gps.get(3)
+
+        if my_tuple:
+            decimal_value = convert_to_decimal(my_tuple)
+
+            if ref == "W":
+                return -decimal_value
+            return decimal_value
+    return None
+
 
 def datatime(data: dict):
-    pass
+    return data.get("DateTimeOriginal","zero")
 
 
 def camera_make(data: dict):
-    pass
+    make = data.get("Make","zero")
+    if isinstance(make,str):
+        return make.strip().replace("\x00","")
+    return make
+
+def convert_to_decimal(gps_tup):
+    degrees = float(gps_tup[0])
+    minutes = float(gps_tup[1])
+    seconds = float(gps_tup[2])
+
+    result = degrees + (minutes / 60) + (seconds / 3600)
+    return round(result,6)
 
 
 def camera_model(data: dict):
-    pass
+    model = data.get("Model","zero")
+    if isinstance(model,str):
+        return model.strip().replace("\x00","")
 
+    return model
 
 def extract_metadata(image_path):
     """
@@ -82,6 +125,7 @@ def extract_metadata(image_path):
         "camera_model": camera_model(data),
         "has_gps": has_gps(data)
     }
+    #print(data)
     return exif_dict
 
 
@@ -95,4 +139,13 @@ def extract_all(folder_path):
     Returns:
         list של dicts (כמו extract_metadata)
     """
-    pass
+
+    exif_list = []
+    for img_path in Path(folder_path).glob("*.jpg"):
+        result = extract_metadata(img_path)
+        exif_list.append(result)
+    return exif_list
+
+
+print(extract_metadata(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images\sample_data\20230803_125716.jpg"))
+print(extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images\sample_data"))
