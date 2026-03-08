@@ -145,7 +145,3 @@ def extract_all(folder_path):
         result = extract_metadata(img_path)
         exif_list.append(result)
     return exif_list
-
-
-print(extract_metadata(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images\sample_data\20230803_125716.jpg"))
-print(extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images\sample_data"))
