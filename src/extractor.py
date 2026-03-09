@@ -13,12 +13,14 @@ extractor.py - שליפת EXIF מתמונות
 
 
 def has_gps(data: dict):
-    flag = data.get("GPSInfo")
-    if flag:
+    
+    lat = latitude(data)
+    lon = longitude(data)
+
+    if lat is not None and lon is not None:
         return True
     else:
         return False
-
 
 def latitude(data: dict):
     gps = data.get("GPSInfo")
@@ -140,9 +142,8 @@ def extract_all(folder_path):
     """
 
     exif_list = []
-    for img_path in Path(folder_path).glob("*.jpg"):
+    for img_path in Path(folder_path).rglob("*.jpg"):
         result = extract_metadata(img_path)
         exif_list.append(result)
     return exif_list
 
-print(extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images\sample_data"))
