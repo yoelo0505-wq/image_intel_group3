@@ -13,12 +13,14 @@ extractor.py - שליפת EXIF מתמונות
 
 
 def has_gps(data: dict):
-    flag = data.get("GPSInfo")
-    if flag:
+    
+    lat = latitude(data)
+    lon = longitude(data)
+
+    if lat is not None and lon is not None:
         return True
     else:
         return False
-
 
 def latitude(data: dict):
     gps = data.get("GPSInfo")
@@ -113,9 +115,9 @@ def extract_metadata(image_path):
     for tag_id, value in exif.items():
         tag = TAGS.get(tag_id, tag_id)
         data[tag] = value
-
+    
     # תיקון: הוסר print(data) שהיה כאן - הדפיס את כל ה-EXIF הגולמי על כל תמונה
-
+    
     exif_dict = {
         "filename": path.name,
         "datetime": datatime(data),
@@ -125,7 +127,6 @@ def extract_metadata(image_path):
         "camera_model": camera_model(data),
         "has_gps": has_gps(data)
     }
-    #print(data)
     return exif_dict
 
 
@@ -141,7 +142,8 @@ def extract_all(folder_path):
     """
 
     exif_list = []
-    for img_path in Path(folder_path).glob("*.jpg"):
+    for img_path in Path(folder_path).rglob("*.jpg"):
         result = extract_metadata(img_path)
         exif_list.append(result)
     return exif_list
+
