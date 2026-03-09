@@ -15,6 +15,7 @@ map_view.py - יצירת מפה אינטראקטיבית
 
 import folium
 from extractor import extract_all
+from timeline import create_timeline
 
 # def sort_by_time(arr):
 #     pass
@@ -60,21 +61,13 @@ def create_map(images_data):
             popup=f"{img['filename']}<br>{img['datetime']}<br>{img['camera_model']}",
             icon= costum_icon
         ).add_to(m)
+        create_timeline(exif_data,m=m)
     
     return m._repr_html_()
 
 
 
 if __name__ == "__main__":
-    # תיקון: fake_data הועבר לכאן מגוף הקובץ - כדי שלא ירוץ בכל import
-    # fake_data = [
-    #     {"filename": "test1.jpg", "latitude": 32.0853, "longitude": 34.7818,
-    #      "has_gps": True, "camera_make": "Samsung", "camera_model": "Galaxy S23",
-    #      "datetime": "2025-01-12 08:30:00"},
-    #     {"filename": "test2.jpg", "latitude": 31.7683, "longitude": 35.2137,
-    #      "has_gps": True, "camera_make": "Apple", "camera_model": None,
-    #      "datetime": "2025-01-13 09:00:00"},
-    # ]
 
     exif_data = extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images")
 

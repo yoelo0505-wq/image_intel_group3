@@ -13,7 +13,6 @@ extractor.py - שליפת EXIF מתמונות
 
 
 def has_gps(data: dict):
-    
     lat = latitude(data)
     lon = longitude(data)
 
@@ -21,6 +20,7 @@ def has_gps(data: dict):
         return True
     else:
         return False
+
 
 def latitude(data: dict):
     gps = data.get("GPSInfo")
@@ -115,9 +115,9 @@ def extract_metadata(image_path):
     for tag_id, value in exif.items():
         tag = TAGS.get(tag_id, tag_id)
         data[tag] = value
-    
+
     # תיקון: הוסר print(data) שהיה כאן - הדפיס את כל ה-EXIF הגולמי על כל תמונה
-    
+
     exif_dict = {
         "filename": path.name,
         "datetime": datatime(data),
@@ -127,6 +127,7 @@ def extract_metadata(image_path):
         "camera_model": camera_model(data),
         "has_gps": has_gps(data)
     }
+    #print(data)
     return exif_dict
 
 
@@ -147,3 +148,4 @@ def extract_all(folder_path):
         exif_list.append(result)
     return exif_list
 
+#print(extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images"))
