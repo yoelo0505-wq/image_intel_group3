@@ -61,7 +61,7 @@ def create_map(images_data):
             popup=f"{img['filename']}<br>{img['datetime']}<br>{img['camera_model']}",
             icon= costum_icon
         ).add_to(m)
-        create_timeline(exif_data,m=m)
+    create_timeline(images_data=images_data,m=m)
     
     return m._repr_html_()
 
