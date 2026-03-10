@@ -127,7 +127,6 @@ def extract_metadata(image_path):
         "camera_model": camera_model(data),
         "has_gps": has_gps(data)
     }
-    #print(data)
     return exif_dict
 
 
@@ -143,9 +142,12 @@ def extract_all(folder_path):
     """
 
     exif_list = []
-    for img_path in Path(folder_path).rglob("*.jpg"):
-        result = extract_metadata(img_path)
-        exif_list.append(result)
-    return exif_list
+    images_types = {".jpg",".jpeg",".png",".webp"}
+    for img_path in Path(folder_path).rglob("*"):
+        if img_path.suffix.lower() in images_types:
+            result = extract_metadata(img_path)
+            exif_list.append(result)
 
-#print(extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images"))
+    return exif_list
+    
+

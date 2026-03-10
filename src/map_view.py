@@ -66,12 +66,3 @@ def create_map(images_data):
     return m._repr_html_()
 
 
-
-if __name__ == "__main__":
-
-    exif_data = extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images")
-
-    html = create_map(exif_data)
-    with open("test_map.html", "w", encoding="utf-8") as f:
-        f.write(html)
-    print("Map saved to test_map.html")
