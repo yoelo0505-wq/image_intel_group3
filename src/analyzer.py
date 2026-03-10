@@ -11,6 +11,7 @@ def analyze(images_data : list[dict]) -> dict:
         end_date = max(map(lambda x: x["datetime"],with_date))
     else:
         start_date = end_date = "N/A"
+
     insights = []
     
     insights.append(f"Found {len(uniq_camera_models)} different camera model(s)")
@@ -46,6 +47,3 @@ def analyze(images_data : list[dict]) -> dict:
     return analyze_dict
           
 
-if __name__ == "__main__":
-    images_data = extract_all(r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images")
-    print(analyze(images_data))
