@@ -1,10 +1,28 @@
 import os
-from ultralytics import YOLO
+import json
+from PIL import Image
 
-# Load the AI model
-model = YOLO('yolov8n.pt')
+# We hold the models here so they only load once!
+yolo_model = None
+gemini_client = None
 
-def count_objects(image_path):
+def get_yolo_model():
+    global yolo_model
+    if yolo_model is None:
+        from ultralytics import YOLO
+        yolo_model = YOLO('yolov8n.pt') 
+    return yolo_model
+
+def get_gemini_client():
+    global gemini_client
+    if gemini_client is None:
+        from google import genai
+       
+        gemini_client = genai.Client(api_key="AIzaSyArpBRJC7tOQ649_GJPv_FUcL5GYbDUSJs")
+    return gemini_client
+
+def count_objects_yolo(image_path):
+    model = get_yolo_model()
     results = model(image_path)
     item_counts = {}
     category_names = results[0].names
@@ -20,22 +38,51 @@ def count_objects(image_path):
             
     return item_counts
 
-def process_image_folder(folder_path):
+def count_objects_gemini(image_path):
+    try:
+        client = get_gemini_client()
+        img = Image.open(image_path)
+        
+        prompt = """
+        Look carefully at this image. Find and count the main objects you see. 
+        Return ONLY a valid JSON dictionary where the keys are the object names in lowercase 
+        and the values are the numbers. Do not write any other text.
+        Example format: {"pool": 1, "cookie": 3, "car": 2}
+        """
+        
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[prompt, img]
+        )
+        
+        clean_text = response.text.replace('```json', '').replace('```', '').strip()
+        item_counts = json.loads(clean_text)
+        return item_counts
+        
+    except Exception as e:
+        print(f"Error checking {image_path}: {e}")
+        return {}
+
+def process_image_folder(folder_path, smart_mode=False):
     all_images_data = []
     
-    # os.walk goes through the main folder AND all sub-folders!
+    print(f"\n--- Starting Analysis! Smart Mode is: {smart_mode} ---")
+    
     for root, dirs, files in os.walk(folder_path):
         for filename in files:
-            # Added .webp just in case you have modern image formats
             if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
                 full_path = os.path.join(root, filename)
                 
-                # Scan the image
-                image_data = count_objects(full_path)
+                if smart_mode:
+                    print(f"Sending {filename} to Gemini (Web AI)...")
+                    image_data = count_objects_gemini(full_path)
+                else:
+                    print(f"Scanning {filename} with YOLO (Local AI)...")
+                    image_data = count_objects_yolo(full_path)
                 
-                # We only add it to the report if the AI actually found something
                 if image_data: 
                     image_result = {filename: image_data}
                     all_images_data.append(image_result)
-                
+                    print(f"Success! Found: {image_data}")
+                    
     return all_images_data
