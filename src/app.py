@@ -10,9 +10,11 @@ from timeline import create_timeline
 from analyzer import analyze
 from report import create_report  
 
+from spcieal_aiAnalyzer import process_image_folder 
+
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/') #GET
 def home():
     return '''
     <!DOCTYPE html>
@@ -115,31 +117,25 @@ def home():
             const fileInput = document.getElementById('file-input');
             const dropText = document.getElementById('drop-text');
             
-            // This acts as our virtual basket to hold all accumulated files
             const dataTransfer = new DataTransfer();
 
-            // Function to add new files to our basket
             function handleFiles(newFiles) {
                 for (let i = 0; i < newFiles.length; i++) {
                     dataTransfer.items.add(newFiles[i]);
                 }
-                // Update the hidden input with our accumulated basket
                 fileInput.files = dataTransfer.files;
                 
-                // Update the text on screen
                 if (fileInput.files.length > 0) {
                     dropText.innerHTML = `<span style="color: #38BDF8; font-weight: bold;">${fileInput.files.length} photos selected so far</span>`;
                 }
             }
 
-            // 1. Handle clicking to browse
             dropZone.addEventListener('click', () => fileInput.click());
             
             fileInput.addEventListener('change', (e) => {
                 handleFiles(e.target.files);
             });
 
-            // 2. Handle dragging and dropping
             dropZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 dropZone.classList.add('dragover');
@@ -190,11 +186,16 @@ def run_analysis():
         temp_map = folium.Map(location=[32.0, 34.8], zoom_start=8)
         timeline_html = create_timeline(data, m=temp_map)
 
+        # 1. Run the AI Object Detection on the folder!
+        yolo_data_results = process_image_folder(target_directory)
+
+        # 2. Pass the results to the report generator
         final_report = create_report(
             images_data=data,
             map_html=map_html,
             timeline_html=timeline_html,
-            analysis=analysis_results
+            analysis=analysis_results,
+            yolo_data=yolo_data_results 
         )
         return final_report
 

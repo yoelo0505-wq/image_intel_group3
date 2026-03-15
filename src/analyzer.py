@@ -14,7 +14,7 @@ def analyze(images_data : list[dict]) -> dict:
 
     insights = []
     
-    insights.append(f"Found {len(uniq_camera_models)} different camera model(s)")
+    insights.append(f"Found {len(uniq_camera_models)} different camera models")
 
     if len(with_date) > 1:
         
