@@ -14,7 +14,19 @@ from spcieal_aiAnalyzer import process_image_folder
 
 app = Flask(__name__)
 
-@app.route('/') #GET
+# DEVELOPER CONTROLS 
+DEV_SMART_MODE = False  
+
+def smart_mode(is_active):
+    global DEV_SMART_MODE
+    DEV_SMART_MODE = is_active
+    print(f"[*] Developer switched Smart Mode to: {DEV_SMART_MODE}")
+
+# DEVELOPER: Change this to True to use Gemini, or False to use YOLO!
+smart_mode(True) 
+
+
+@app.route('/') 
 def home():
     return '''
     <!DOCTYPE html>
@@ -186,16 +198,15 @@ def run_analysis():
         temp_map = folium.Map(location=[32.0, 34.8], zoom_start=8)
         timeline_html = create_timeline(data, m=temp_map)
 
-        # 1. Run the AI Object Detection on the folder!
-        yolo_data_results = process_image_folder(target_directory)
+        # Uses the global developer switch right here!
+        yolo_data_results = process_image_folder(target_directory, smart_mode=DEV_SMART_MODE)
 
-        # 2. Pass the results to the report generator
         final_report = create_report(
             images_data=data,
             map_html=map_html,
             timeline_html=timeline_html,
             analysis=analysis_results,
-            yolo_data=yolo_data_results 
+            yolo_data=yolo_data_results
         )
         return final_report
 

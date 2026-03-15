@@ -105,14 +105,10 @@ def create_report(images_data, map_html, timeline_html, analysis, yolo_data=None
         </div>
         
         <div class="section">
-            <h2>Map</h2>
+            <h2>Map with timeline and devices</h2>
             {map_html}
         </div>
         
-        <div class="section">
-            <h2>Timeline</h2>
-            {timeline_html}
-        </div>
         
         <div class="section">
             <h2>Devices</h2>
