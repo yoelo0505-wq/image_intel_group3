@@ -1,6 +1,6 @@
 from datetime import datetime
 
-def create_report(images_data, map_html, timeline_html, analysis):
+def create_report(images_data, map_html, timeline_html, analysis, yolo_data=None):
     now = datetime.now().strftime("%d/%m/%Y %H:%M")
     
     insights_html = ""
@@ -10,7 +10,55 @@ def create_report(images_data, map_html, timeline_html, analysis):
     cameras_html = ""
     for cam in analysis.get("unique_cameras", []):
         cameras_html += f"<span class='badge'>{cam}</span> "
+        
+    # --- NEW: Build the YOLO AI Table ---
+    yolo_table_html = ""
+    if yolo_data:
+        yolo_table_html = """
+        <div class="section">
+            <h2>AI Object Detection Intelligence</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr style="background-color: #1B4F72; color: white; text-align: left;">
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Image File</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Detected Objects (אובייקטים שזוהו)</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        
+        # Iterate through the list of dictionaries
+        for image_dict in yolo_data:
+            for img_name, objects in image_dict.items():
+                
+                # Format the objects as nice green badges
+                objects_list = []
+                for obj_name, count in objects.items():
+                    badge = f"<span class='badge' style='background-color:#28B463;'>{obj_name}: {count}</span>"
+                    objects_list.append(badge)
+                    
+                objects_str = " ".join(objects_list)
+                
+                # If the AI found nothing, show a message
+                if not objects_str:
+                    objects_str = "<span style='color: #888; font-style: italic;'>No objects found</span>"
+                    
+                # Add the row to our HTML table
+                yolo_table_html += f"""
+                <tr style="border-bottom: 1px solid #ddd; background-color: #fafafa;">
+                    <td style="padding: 12px; font-weight: bold; color: #1B4F72;">{img_name}</td>
+                    <td style="padding: 12px;">{objects_str}</td>
+                </tr>
+                """
+                
+        # Close the table and section tags
+        yolo_table_html += """
+                </tbody>
+            </table>
+        </div>
+        """
     
+    # --- Main HTML Assembly ---
     html = f"""
     <!DOCTYPE html>
     <html lang="en" dir="ltr">
@@ -71,6 +119,8 @@ def create_report(images_data, map_html, timeline_html, analysis):
             {cameras_html}
         </div>
         
+        {yolo_table_html}
+        
         <div style="text-align:center; color:#888; margin-top:30px;">
             Image Intel | Hackathon 2025
         </div>
@@ -78,31 +128,3 @@ def create_report(images_data, map_html, timeline_html, analysis):
     </html>
     """
     return html
-
-# if __name__ == "__main__":
-#     from extractor import extract_all
-#     from map_view import create_map
-#     from timeline import create_timeline
-#     from analyzer import analyze
-
-#     path = r"C:\Users\yoelo\OneDrive\שולחן העבודה\end-project\image_intel_group3\images"
-    
-    
-#     data = extract_all(path)
-#     analysis_results = analyze(data)
-#     map_str = create_map(data)
-
-#     temp_map = folium.Map(location=[32.0, 34.8], zoom_start=8)
-#     timeline_str = create_timeline(data, m=temp_map)
-
-#     final_html = create_report(
-#         images_data=data,
-#         map_html=map_str,
-#         timeline_html=timeline_str,
-#         analysis=analysis_results
-#     )
-
-#     with open("test_report.html", "w", encoding="utf-8") as f:
-#         f.write(final_html)
-
-#     print("Process finished! Open 'test_report.html' to see the full result.")
